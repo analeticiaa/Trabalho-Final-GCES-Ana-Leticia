@@ -1,0 +1,12 @@
+{
+  "env": {
+    "node": true,
+    "es6": true
+  },
+  "rules": {
+    "no-unused-vars": "warn",
+    "no-undef": "error",
+    "semi": ["error", "always"],
+    "no-console": "off"
+  }
+}

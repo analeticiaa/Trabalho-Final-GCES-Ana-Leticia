@@ -8,5 +8,13 @@
         "socket.io": "0.9.x",
         "pg": "8.x.x"
     },
+    "devDependencies": {
+        "eslint": "^8.0.0"
+    },
+    "scripts": {
+        "start": "node server.js",
+        "dev": "nodemon server.js",
+        "lint": "eslint *.js"
+    },
     "license": "MIT"
 }
