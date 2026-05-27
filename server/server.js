@@ -3,7 +3,28 @@ var express = require('express'),
     server = require('http').createServer(app),
     io = require('socket.io').listen(server),
     GameCollection = require('./games.js').GameCollection,
-    games = new GameCollection();
+    games = new GameCollection(),
+    { Pool } = require('pg');
+
+var pool = new Pool({
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'mkjs',
+  password: process.env.DB_PASSWORD || 'mkjs123',
+  database: process.env.DB_NAME || 'mkjs',
+  port: 5432
+});
+
+pool.query(`
+  CREATE TABLE IF NOT EXISTS partidas (
+    id SERIAL PRIMARY KEY,
+    jogo VARCHAR(100),
+    criado_em TIMESTAMP DEFAULT NOW()
+  )
+`).then(function() {
+  console.log('Tabela partidas pronta.');
+}).catch(function(err) {
+  console.error('Erro ao criar tabela:', err.message);
+});
 
 app.configure(function () {
   app.use(express.static(__dirname + '/../game'));
@@ -27,6 +48,8 @@ io.sockets.on('connection', function (socket) {
     if (games.createGame(gameName)) {
       games.getGame(gameName).addPlayer(socket);
       socket.emit('response', Responses.SUCCESS);
+      pool.query('INSERT INTO partidas (jogo) VALUES ($1)', [gameName])
+        .catch(function(err) { console.error('Erro ao salvar partida:', err.message); });
     } else {
       socket.emit('response', Responses.GAME_EXISTS);
     }
