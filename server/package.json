@@ -10,13 +10,15 @@
     },
     "devDependencies": {
         "eslint": "^8.0.0",
-        "jest": "^29.0.0"
+        "jest": "^29.0.0",
+        "@jazzer.js/core": "^2.0.0"
     },
     "scripts": {
         "start": "node server.js",
         "dev": "nodemon server.js",
         "lint": "eslint *.js",
-        "test": "jest"
+        "test": "jest",
+        "fuzz": "jazzer fuzz"
     },
     "license": "MIT"
 }

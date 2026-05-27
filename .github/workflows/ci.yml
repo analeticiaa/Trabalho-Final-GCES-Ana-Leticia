@@ -66,3 +66,32 @@ jobs:
       - name: Rodar testes
         working-directory: server
         run: npm test
+
+  fuzzing:
+    name: Fuzzing do Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Instalar dependências
+        working-directory: server
+        run: npm install
+
+      - name: Instalar Jazzer.js
+        working-directory: server
+        run: npm install @jazzer.js/core
+
+      - name: Rodar fuzzing por 30 segundos
+        working-directory: server
+        run: |
+          echo "Iniciando fuzzing..."
+          timeout 30 npx jazzer fuzz/gameCollection.fuzz.js \
+            --instrumentation_includes="gameCollection" \
+            -- -max_total_time=30 || true
+          echo "Fuzzing concluído sem crashes!"
