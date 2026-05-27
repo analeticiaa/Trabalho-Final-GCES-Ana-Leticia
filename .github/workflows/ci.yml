@@ -12,16 +12,20 @@ jobs:
   lint-backend:
     name: Lint do Backend
     runs-on: ubuntu-latest
+
     steps:
       - name: Clonar repositório
         uses: actions/checkout@v4
+
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
+
       - name: Instalar dependências
         working-directory: server
         run: npm install
+
       - name: Rodar lint
         working-directory: server
         run: npm run lint
@@ -29,9 +33,11 @@ jobs:
   build-frontend:
     name: Build do Frontend
     runs-on: ubuntu-latest
+
     steps:
       - name: Clonar repositório
         uses: actions/checkout@v4
+
       - name: Verificar arquivos do frontend
         run: |
           echo "Verificando arquivos do frontend..."
@@ -43,16 +49,20 @@ jobs:
   testes-unitarios:
     name: Testes Unitários
     runs-on: ubuntu-latest
+
     steps:
       - name: Clonar repositório
         uses: actions/checkout@v4
+
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
+
       - name: Instalar dependências
         working-directory: server
         run: npm install
+
       - name: Rodar testes
         working-directory: server
         run: npm test

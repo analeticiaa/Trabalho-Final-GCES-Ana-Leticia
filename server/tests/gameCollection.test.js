@@ -28,11 +28,11 @@ describe('GameCollection', function() {
     expect(partida).toBeNull();
   });
 
-  test('TESTE QUEBRADO - deve falhar de proposito', function() {
+test('deve retornar false para partida vazia', function() {
     var gc = new GameCollection();
     gc.createGame('partida1');
     var resultado = gc.isFull('partida1');
-    expect(resultado).toBe(true);
+    expect(resultado).toBe(false);
   });
 
 });
