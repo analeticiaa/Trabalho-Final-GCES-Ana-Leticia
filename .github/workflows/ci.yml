@@ -1,4 +1,4 @@
-name: CI - Build, Lint e Testes
+name: CI - Build, Lint, Testes, Fuzzing e Segurança
 
 on:
   push:
@@ -12,7 +12,6 @@ jobs:
   lint-backend:
     name: Lint do Backend
     runs-on: ubuntu-latest
-
     steps:
       - name: Clonar repositório
         uses: actions/checkout@v4
@@ -33,7 +32,6 @@ jobs:
   build-frontend:
     name: Build do Frontend
     runs-on: ubuntu-latest
-
     steps:
       - name: Clonar repositório
         uses: actions/checkout@v4
@@ -49,7 +47,6 @@ jobs:
   testes-unitarios:
     name: Testes Unitários
     runs-on: ubuntu-latest
-
     steps:
       - name: Clonar repositório
         uses: actions/checkout@v4
@@ -95,3 +92,54 @@ jobs:
             --instrumentation_includes="gameCollection" \
             -- -max_total_time=30 || true
           echo "Fuzzing concluído sem crashes!"
+
+  sast:
+    name: SAST - Semgrep
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositório
+        uses: actions/checkout@v4
+
+      - name: Rodar Semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: .semgrep.yml
+        continue-on-error: true
+
+      - name: Semgrep com regras padrão de segurança
+        run: |
+          pip install semgrep
+          semgrep --config=auto --lang=javascript server/ \
+            --severity=ERROR \
+            --error || true
+        continue-on-error: true
+
+  sca:
+    name: SCA - Auditoria de Dependências
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Instalar dependências
+        working-directory: server
+        run: npm install
+
+      - name: Rodar auditoria de segurança
+        working-directory: server
+        run: |
+          echo "=== Relatório de vulnerabilidades nas dependências ==="
+          npm audit --json > audit-report.json || true
+          npm audit || true
+          echo "=== Auditoria concluída ==="
+
+      - name: Salvar relatório de auditoria
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-report
+          path: server/audit-report.json

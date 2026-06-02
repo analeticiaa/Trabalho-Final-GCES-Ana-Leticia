@@ -1,0 +1,20 @@
+rules:
+  - id: no-eval
+    pattern: eval(...)
+    message: "Uso de eval() é perigoso e pode causar injeção de código"
+    languages: [javascript]
+    severity: ERROR
+
+  - id: no-hardcoded-passwords
+    pattern: |
+      var $X = "..."
+    message: "Possível senha hardcoded encontrada"
+    languages: [javascript]
+    severity: WARNING
+
+  - id: sql-injection-risk
+    pattern: |
+      $QUERY + $VAR
+    message: "Possível concatenação insegura em query SQL"
+    languages: [javascript]
+    severity: WARNING
