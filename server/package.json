@@ -17,8 +17,19 @@
         "start": "node server.js",
         "dev": "nodemon server.js",
         "lint": "eslint *.js",
-        "test": "jest",
+        "test": "jest --coverage",
         "fuzz": "jazzer fuzz"
+    },
+    "jest": {
+        "collectCoverageFrom": [
+            "*.js",
+            "!server.js"
+        ],
+        "coverageReporters": [
+            "lcov",
+            "text"
+        ],
+        "coverageDirectory": "coverage"
     },
     "license": "MIT"
 }

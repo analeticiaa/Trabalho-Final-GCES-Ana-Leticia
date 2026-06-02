@@ -1,4 +1,4 @@
-name: CI - Build, Lint, Testes, Fuzzing e Segurança
+name: CI - Build, Lint, Testes, Fuzzing, Segurança e Qualidade
 
 on:
   push:
@@ -60,9 +60,15 @@ jobs:
         working-directory: server
         run: npm install
 
-      - name: Rodar testes
+      - name: Rodar testes com cobertura
         working-directory: server
         run: npm test
+
+      - name: Salvar relatório de cobertura
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: server/coverage/
 
   fuzzing:
     name: Fuzzing do Backend
@@ -143,3 +149,30 @@ jobs:
         with:
           name: audit-report
           path: server/audit-report.json
+
+  sonarcloud:
+    name: SonarCloud - Qualidade de Código
+    runs-on: ubuntu-latest
+    needs: testes-unitarios
+    steps:
+      - name: Clonar repositório
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Instalar dependências e gerar cobertura
+        working-directory: server
+        run: |
+          npm install
+          npm test
+
+      - name: Analisar com SonarCloud
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
