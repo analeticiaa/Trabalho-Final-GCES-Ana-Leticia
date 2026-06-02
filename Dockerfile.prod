@@ -1,0 +1,36 @@
+# ETAPA 1 — Build do backend
+FROM node:18-alpine AS backend-build
+
+WORKDIR /app/server
+
+COPY server/package.json .
+
+RUN npm install --omit=dev
+
+COPY server/ .
+
+# ETAPA 2 — Servidor de produção do frontend com Nginx
+FROM nginx:alpine AS frontend
+
+COPY game/ /usr/share/nginx/html
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# ETAPA 3 — Imagem final de produção
+FROM node:18-alpine AS production
+
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+WORKDIR /app
+
+COPY --from=backend-build /app/server ./server
+
+RUN chown -R appuser:appgroup /app
+
+USER appuser
+
+EXPOSE 55555
+
+WORKDIR /app/server
+
+CMD ["node", "server.js"]
